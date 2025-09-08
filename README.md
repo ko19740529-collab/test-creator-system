@@ -10,7 +10,7 @@
 - **プロジェクトページ**: https://test-creator-system.pages.dev
 - **開発環境**: https://3000-iy9roslhge4a18rtrxtlu-6532622b.e2b.dev
 - **API統計**: https://877772c2.test-creator-system.pages.dev/api/categories/stats/overview
-- **GitHub**: （GitHub設定後に追加予定）
+- **GitHub**: https://github.com/ko19740529-collab/test-creator-system
 
 ## 📊 データアーキテクチャ
 
