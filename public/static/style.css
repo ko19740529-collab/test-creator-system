@@ -1,1 +1,178 @@
-h1 { font-family: Arial, Helvetica, sans-serif; }
+/* Custom styles for the test creation system */
+
+/* Base styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Navigation styles */
+.nav-btn {
+  @apply px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors;
+}
+
+.nav-btn.active {
+  @apply text-blue-600 bg-blue-50 hover:bg-blue-100;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors;
+}
+
+.btn-danger {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors;
+}
+
+.btn-success {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors;
+}
+
+/* Form styles */
+.input-field {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm;
+}
+
+.textarea-field {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm resize-vertical;
+}
+
+/* Section visibility */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+/* Table styles */
+.table-row:hover {
+  @apply bg-gray-50;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-screen overflow-y-auto;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-gray-200;
+}
+
+.modal-body {
+  @apply px-6 py-4;
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-gray-200 flex justify-end space-x-3;
+}
+
+/* Drag and drop styles */
+.drop-zone {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors;
+}
+
+.drop-zone.dragover {
+  @apply border-blue-400 bg-blue-50;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.2s ease-in;
+}
+
+.fade-out {
+  animation: fadeOut 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Notification styles */
+.notification {
+  @apply fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm;
+}
+
+.notification.success {
+  @apply bg-green-100 border border-green-400 text-green-700;
+}
+
+.notification.error {
+  @apply bg-red-100 border border-red-400 text-red-700;
+}
+
+.notification.warning {
+  @apply bg-yellow-100 border border-yellow-400 text-yellow-700;
+}
+
+.notification.info {
+  @apply bg-blue-100 border border-blue-400 text-blue-700;
+}
+
+/* Word selection styles */
+.word-item {
+  @apply flex items-center p-2 border border-gray-200 rounded hover:bg-gray-50;
+}
+
+.word-item input[type="checkbox"] {
+  @apply mr-3;
+}
+
+/* Preview styles */
+.preview-question {
+  @apply p-4 border border-gray-200 rounded-lg mb-3;
+}
+
+.preview-question.english-to-japanese {
+  @apply border-l-4 border-l-blue-500;
+}
+
+.preview-question.japanese-to-english {
+  @apply border-l-4 border-l-green-500;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .modal-content {
+    @apply m-2;
+  }
+  
+  .grid-responsive {
+    @apply grid-cols-1 !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}
