@@ -243,7 +243,7 @@ words.delete('/', async (c) => {
 // Import words from CSV
 words.post('/import', async (c) => {
   try {
-    const { words: importWords } = await c.req.json()
+    const { words: importWords, options = {} } = await c.req.json()
 
     if (!Array.isArray(importWords) || importWords.length === 0) {
       return c.json({
@@ -252,7 +252,10 @@ words.post('/import', async (c) => {
       } as ApiResponse, 400)
     }
 
+    const { skip_duplicates = true, create_categories = true } = options
+
     let successCount = 0
+    let skippedCount = 0
     let errors: string[] = []
 
     // Process in batches for better performance
@@ -261,8 +264,20 @@ words.post('/import', async (c) => {
         const { english, japanese, category = '基本単語', difficulty = 1 } = wordData as CSVImportRow
 
         if (!english || !japanese) {
-          errors.push(`Skipping invalid row: ${JSON.stringify(wordData)}`)
+          errors.push(`Skipping invalid row: missing english or japanese`)
           continue
+        }
+
+        // Check for duplicates if skip_duplicates is enabled
+        if (skip_duplicates) {
+          const existingWord = await c.env.DB.prepare(`
+            SELECT id FROM words WHERE LOWER(english) = LOWER(?) OR LOWER(japanese) = LOWER(?)
+          `).bind(english.trim(), japanese.trim()).first()
+
+          if (existingWord) {
+            skippedCount++
+            continue
+          }
         }
 
         // Get or create category
@@ -273,35 +288,60 @@ words.post('/import', async (c) => {
           `).bind(category).first()
 
           if (!categoryResult) {
-            const newCategory = await c.env.DB.prepare(`
-              INSERT INTO categories (name, description) VALUES (?, ?)
-            `).bind(category, `Imported category: ${category}`).run()
-            categoryId = newCategory.meta.last_row_id as number
+            if (create_categories) {
+              const newCategory = await c.env.DB.prepare(`
+                INSERT INTO categories (name, description) VALUES (?, ?)
+              `).bind(category, `Imported category: ${category}`).run()
+              categoryId = newCategory.meta.last_row_id as number
+            } else {
+              errors.push(`Category "${category}" not found for word: ${english}`)
+              continue
+            }
           } else {
             categoryId = categoryResult.id as number
           }
         }
 
+        // Validate and normalize difficulty
+        const normalizedDifficulty = Math.min(5, Math.max(1, parseInt(difficulty?.toString()) || 1))
+
         // Insert word
-        await c.env.DB.prepare(`
+        const result = await c.env.DB.prepare(`
           INSERT INTO words (english, japanese, category_id, difficulty)
           VALUES (?, ?, ?, ?)
-        `).bind(english, japanese, categoryId, difficulty || 1).run()
+        `).bind(english.trim(), japanese.trim(), categoryId, normalizedDifficulty).run()
 
-        successCount++
+        if (result.success) {
+          successCount++
+        } else {
+          errors.push(`Failed to insert word: ${english}`)
+        }
       } catch (error) {
         errors.push(`Error importing word ${wordData.english}: ${error}`)
       }
+    }
+
+    const totalProcessed = successCount + skippedCount + errors.length
+    let message = `Successfully imported ${successCount} words`
+    
+    if (skippedCount > 0) {
+      message += `, skipped ${skippedCount} duplicates`
+    }
+    
+    if (errors.length > 0) {
+      message += `, ${errors.length} errors occurred`
     }
 
     return c.json({
       success: true,
       data: {
         imported: successCount,
+        skipped: skippedCount,
         errors: errors.length,
-        errorDetails: errors
+        total_processed: totalProcessed,
+        errorDetails: errors.slice(0, 10) // Limit error details
       },
-      message: `Successfully imported ${successCount} words`
+      message
     } as ApiResponse)
 
   } catch (error) {
